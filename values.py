@@ -4,21 +4,13 @@ db = sqlite3.connect('server.db')
 sql = db.cursor()
 
 
-#    for value in sql.execute("SELECT department FROM departments WHERE name = ?", (name,)):
-
-def db():
-    dep_list = []
-    for info in sql.execute("SELECT * FROM departments"):
-        dep_list.append(info)
-    return dep_list
+def get_departments():
+    res = sql.execute("SELECT * FROM departments").fetchall()
+    my_dict = {i[0]: list(i[1:]) for i in res}
+    return my_dict
 
 
-def get_names():
-    so_names = []
-    for value in db():
-        name = value[1]
-        if name not in so_names:
-            so_names.append(name)
-    return so_names
-
-
+def get_so():
+    res = sql.execute("SELECT * FROM so_names").fetchall()
+    my_dict = {i[1]: [i[0], i[2], i[3], i[4]] for i in res}
+    return my_dict
