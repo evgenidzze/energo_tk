@@ -6,6 +6,7 @@ from change_docx import dictionary
 from PIL import ImageTk, Image
 from PIL.Image import Resampling
 from change_docx import replace_data
+from styles.button_next import next_button, back_button
 from values import *
 from pathlib import Path
 from tkcalendar import DateEntry
@@ -21,7 +22,7 @@ class Page1(tk.Frame):
     saved_dep = ''
 
     def __init__(self, parent, controller, bg=None):
-        tk.Frame.__init__(self, parent, bg=bg)
+        tk.Frame.__init__(self, parent, bg='white')
 
         def pick_dep(e):
             """Create dependent list of departments"""
@@ -48,60 +49,81 @@ class Page1(tk.Frame):
             controller.show_frame(Page2)
 
         im = Image.open('media/main_logo.png')
-        im = im.resize((250, 250), Resampling.LANCZOS)
+        im = im.resize((380, 380), Resampling.LANCZOS)
         img = ImageTk.PhotoImage(im)
         label = Label(self, image=img, bg='white')
         label.image = img
-        label.grid()
+        label.grid(padx=(250, 0))
         # Pick Department Frame
         # choose_dep_frame = tk.Canvas(self)
         # choose_dep_frame.grid(padx=130, pady=(10, 0), ipady=10)
 
+        choose_dep_label = Label(self, text='Оберіть дільницю', font=('', 14), bg='white')
+        choose_dep_label.grid(row=1, column=0, pady=5, padx=(30, 0))
+
+        # lines near name
+        Canvas(self, height=2, width=40, highlightbackground='white', bg='#D9DEED').grid(row=1, column=0, padx=(0, 185))
+        Canvas(self, height=2, width=250, highlightbackground='white', bg='#D9DEED').grid(row=1, column=0,
+                                                                                          padx=(460, 0))
+
         canvas = Canvas(self, bg='#D9DEED')
-        canvas.grid()
+        canvas.grid(row=2, column=0, ipady=8, padx=(250, 0), ipadx=11)
 
         # Labels
-        # name_so_label = Label(canvas, text='Назва СО', bg='#D9DEED')
-        # name_so_label.grid(row=0, column=0, pady=5)
-        # departments_label = Label(canvas, text='Дільниця', bg='#D9DEED')
-        # departments_label.grid(row=0, column=1)
-        # date_label = Label(canvas, text='Дата укладення', bg='#D9DEED')
-        # date_label.grid(row=0, column=2)
-        #
-        # # Name Combobox
-        # name_so_combo = ttk.Combobox(canvas, values=list(Page1.so_names_lst))
-        # name_so_combo.grid(row=1, column=0, padx=10, pady=5)
-        # name_so_combo.bind("<<ComboboxSelected>>", pick_dep)
-        #
-        # # Department Combobox
-        # department_combo = ttk.Combobox(canvas, value=[''])
-        # department_combo.grid(row=1, column=1, padx=10, pady=5)
-        #
-        # date = DateEntry(canvas)
-        # date.grid(row=1, column=2, padx=10, pady=5)
+        name_so_label = Label(canvas, text='Назва СО', bg='#D9DEED')
+        name_so_label.grid(row=0, column=0, pady=(15, 5))
+        departments_label = Label(canvas, text='Дільниця', bg='#D9DEED')
+        departments_label.grid(row=0, column=1, pady=(15, 5))
+        date_label = Label(canvas, text='Дата укладення', bg='#D9DEED')
+        date_label.grid(row=0, column=2, pady=(15, 5))
 
-        button_next = ttk.Button(self, text='>', width=8, command=save_name_dep)
-        button_next.grid(pady=5)
+        # Name So Combobox
+        name_so_combo = ttk.Combobox(canvas, values=list(Page1.so_names_lst), width=27)
+        name_so_combo.grid(row=1, column=0, padx=(23, 15), pady=5)
+        name_so_combo.bind("<<ComboboxSelected>>", pick_dep)
+
+        # Department Combobox
+        department_combo = ttk.Combobox(canvas, value=[''], width=27)
+        department_combo.grid(row=1, column=1, pady=5)
+
+        # Date
+        date = DateEntry(canvas)
+        date.grid(row=1, column=2, pady=5, padx=(15, 0))
+
+        footer_frame = tk.Frame(self, background="white")
+        footer_frame.grid(pady=(190, 0), padx=(210, 0), sticky='se', column=1)
+
+        # self повернути і буде кнопка
+
+        next_button(self, footer_frame, save_name_dep)
+        # button_next = ttk.Button(self, text='>', width=10, command=save_name_dep)
+        # button_next.grid(pady=5)
 
 
 class Page2(tk.Frame):
     def __init__(self, parent, controller, bg=None):
         tk.Frame.__init__(self, parent, bg=bg)
+        choose_dep_label = Label(self, text='Оберіть схему', font=('', 14), bg='white')
+        choose_dep_label.pack(pady=(80, 5), padx=(0, 620))
 
-        scheme_frame = ttk.LabelFrame(self, text='Оберіть схему')
-        scheme_frame.pack(fill=BOTH, pady=10)
+        # lines near label
+        Canvas(self, height=2, width=55, highlightbackground='white', bg='#D9DEED').place(x=150, y=92)
+        Canvas(self, height=2, width=480, highlightbackground='white', bg='#D9DEED').place(x=365, y=92)
 
-        canvas = Canvas(scheme_frame, width=700, height=455, bg='white')
-        canvas.pack(side=LEFT, fill=BOTH, expand=1)
+        self.scheme_frame = Canvas(self, bg='#D9DEED')
+        self.scheme_frame.pack(padx=(0, 170))
 
-        scrollbar = Scrollbar(scheme_frame, orient=VERTICAL, command=canvas.yview)
+        canvas = Canvas(self.scheme_frame, width=740, height=480, bg='#D9DEED')
+        canvas.pack(side=LEFT, fill=BOTH, expand=1, pady=20, padx=20)
+
+        scrollbar = Scrollbar(self.scheme_frame, orient=VERTICAL, command=canvas.yview)
         scrollbar.pack(side=RIGHT, fill=Y)
 
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
-        sec_frame = ttk.Frame(canvas)
-        canvas.create_window((2, 2), window=sec_frame, anchor='nw')
+        sec_frame = tk.Frame(canvas, bg='#D9DEED')
+        canvas.create_window((0, 0), window=sec_frame, anchor='nw')
 
         def on_mouse_wheel(event):
             """Mouse wheel"""
@@ -118,25 +140,37 @@ class Page2(tk.Frame):
         # for i in images:  # show real schemes
         for i in range(12):  # show how it looks with 15 schemes
             im = Image.open('media/schemes/scheme_new.png')
-            im = im.resize((144, 204), Resampling.LANCZOS)
+            im = im.resize((158, 220), Resampling.LANCZOS)
             image = ImageTk.PhotoImage(im)
             if column == 4:
                 row += 1
                 column = 0
-            choice = tk.Radiobutton(sec_frame, indicatoron=0, borderwidth=1 / 15, bg='black', variable=1,
+            choice = tk.Radiobutton(sec_frame, indicatoron=0, borderwidth=1 / 15, bg='#7989BE', variable=1,
                                     image=image,
                                     value=value,
                                     relief=GROOVE)
             choice.image = image
-            choice.grid(row=row, column=column, padx=10, pady=10)
+            choice.grid(row=row, column=column, padx=12, pady=10)
             column += 1
             value += 1
 
-        button_next = ttk.Button(self, text='Далі', width=8, command=lambda: controller.show_frame(Page3))
-        button_next.pack(side=RIGHT, padx=15)
+        # button_next = ttk.Button(self, text='Далі', width=8, command=lambda: controller.show_frame(Page3))
+        # button_next.pack(side=RIGHT, padx=15)
+        self.next_b = Image.open('media/button_next.png').resize((105, 35))
+        self.img_n = ImageTk.PhotoImage(self.next_b)
+        next_b = Button(self, image=self.img_n, command=lambda: controller.show_frame(Page3), bg='white', border=0,
+               activebackground='white')
+        next_b.place(x=750, y=650)
 
-        button_back = ttk.Button(self, text='Назад', width=8, command=lambda: controller.show_frame(Page1))
-        button_back.pack(side=LEFT, padx=15)
+        self.back_b = Image.open('media/back_b.png').resize((105, 35))
+        self.img_b = ImageTk.PhotoImage(self.back_b)
+        next_b = Button(self, image=self.img_b, command=lambda: controller.show_frame(Page1), bg='white', border=0,
+                        activebackground='white')
+        next_b.place(x=100, y=650)
+
+        # next_button(self, frame=self, command=lambda: controller.show_frame(Page3), )
+        # back_button(self, frame=self, command=lambda: controller.show_frame(Page3), padx=100, pady=650)
+        # back_button(self, frame=self, command=lambda: controller.show_frame(Page1))
 
 
 class Page3(tk.Frame):
@@ -162,7 +196,7 @@ class Page3(tk.Frame):
             dictionary['т10'] = num_opory.get()
             dictionary['т11'] = line_num.get()
             dictionary['т12'] = line_length.get()
-            dictionary['т12_1'] = int(line_length.get())/1000
+            dictionary['т12_1'] = int(line_length.get()) / 1000
             dictionary['р1'] = active_opir.get()
             dictionary['с1'] = fider_num.get()
             dictionary['л1'] = line_type.get()
@@ -345,16 +379,17 @@ class Application(tk.Tk):
         menubar.add_command(label="Інформація", command=info_window)
         self.config(menu=menubar)
 
-        window = ttk.Frame(self)
-        window.pack()
-
+        window = tk.Frame(self, bg='white', height=750, width=1200)
+        window.grid(padx=250)
+        window.grid_propagate(0)
         self.frames = {}
         for F in (Page1, Page2, Page3, Page4):
             frame = F(window, self, bg='white')
             self.frames[F] = frame
-            frame.grid(row=0, column=0, sticky='nsew')
+            frame.grid(row=0, column=0, ipadx=50, sticky='nsew')
 
-        self.show_frame(Page1)
+        # default is Page1
+        self.show_frame(Page2)
 
     def show_frame(self, page):
         frame = self.frames[page]
@@ -374,7 +409,7 @@ def info_window():
 
 app = Application()
 s = ttk.Style()
-s.configure('TFrame', background='white')
+s.configure('TFrame', background='white', )
 s.configure('TLabelFrame', background='white')
 app.configure(bg='white')
 app.state('zoomed')
