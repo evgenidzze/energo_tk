@@ -1,10 +1,7 @@
-import tkinter as tk
-from tkinter.ttk import Progressbar
-
 from docxtpl import DocxTemplate
 from tkinter import filedialog as fd
 
-doc_1 = DocxTemplate('documents/new_dod.docx')
+doc_1 = DocxTemplate('documents/d_1.docx')
 dictionary = dict()
 
 
